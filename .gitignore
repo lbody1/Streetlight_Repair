@@ -1,11 +1,35 @@
-# Executables and build outputs
+# Compiled Binaries and Objects
 *.exe
 *.o
 *.obj
+*.dll
+*.so
+*.dylib
 
-# OS generated files
+# Secrets, Environment & Credentials (Security Protection)
+.env
+.env.*
+*.pem
+*.key
+*.token
+*secret*
+*credential*
+*.pfx
+
+# IDE and Editor Cache
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated Files
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+# Temporary and Log files
+*.log
+*.tmp
+*.bak
