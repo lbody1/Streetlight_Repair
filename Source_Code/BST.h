@@ -3,159 +3,123 @@
 
 #include <iostream>
 
-// Binary Search Tree Node (R5)
 struct BSTNode {
-    int poleID;
+    int data;
     BSTNode* left;
     BSTNode* right;
 
-    BSTNode(int id) : poleID(id), left(nullptr), right(nullptr) {}
+    BSTNode(int val) : data(val), left(NULL), right(NULL) {}
 };
 
-// BST for Fast Pole ID Indexing and Lookup
-class PoleBSTIndex {
+class PoleBST {
 private:
     BSTNode* root;
-    int nodeCount;
 
-    // Helper: Recursive insert (rejects duplicates)
-    BSTNode* insertHelper(BSTNode* node, int id, bool& inserted) {
-        if (node == nullptr) {
-            inserted = true;
-            nodeCount++;
-            return new BSTNode(id);
+    BSTNode* insertHelper(BSTNode* node, int val) {
+        if (node == NULL) {
+            return new BSTNode(val);
         }
-
-        if (id < node->poleID) {
-            node->left = insertHelper(node->left, id, inserted);
-        } else if (id > node->poleID) {
-            node->right = insertHelper(node->right, id, inserted);
-        } else {
-            // Duplicate key
-            inserted = false;
+        if (val < node->data) {
+            node->left = insertHelper(node->left, val);
+        } else if (val > node->data) {
+            node->right = insertHelper(node->right, val);
         }
         return node;
     }
 
-    // Helper: Recursive search
-    bool searchHelper(BSTNode* node, int id) const {
-        if (node == nullptr) return false;
-        if (node->poleID == id) return true;
-
-        if (id < node->poleID) {
-            return searchHelper(node->left, id);
-        } else {
-            return searchHelper(node->right, id);
-        }
+    bool searchHelper(BSTNode* node, int val) const {
+        if (node == NULL) return false;
+        if (node->data == val) return true;
+        if (val < node->data) return searchHelper(node->left, val);
+        return searchHelper(node->right, val);
     }
 
-    // Helper: Find minimum node (inorder successor)
-    BSTNode* getSuccessor(BSTNode* curr) {
-        curr = curr->right;
-        while (curr != nullptr && curr->left != nullptr) {
-            curr = curr->left;
+    BSTNode* findMin(BSTNode* node) {
+        while (node != NULL && node->left != NULL) {
+            node = node->left;
         }
-        return curr;
+        return node;
     }
 
-    // Helper: Recursive delete (matches Lab 6 slide 27)
-    BSTNode* delNodeHelper(BSTNode* node, int x, bool& deleted) {
-        if (node == nullptr) return nullptr;
+    BSTNode* deleteHelper(BSTNode* node, int val) {
+        if (node == NULL) return NULL;
 
-        if (node->poleID > x) {
-            node->left = delNodeHelper(node->left, x, deleted);
-        } else if (node->poleID < x) {
-            node->right = delNodeHelper(node->right, x, deleted);
+        if (val < node->data) {
+            node->left = deleteHelper(node->left, val);
+        } else if (val > node->data) {
+            node->right = deleteHelper(node->right, val);
         } else {
-            // Node found
-            deleted = true;
-            nodeCount--;
-
-            // Case 1 & Case 2: 0 or 1 child
-            if (node->left == nullptr) {
+            if (node->left == NULL) {
                 BSTNode* temp = node->right;
                 delete node;
                 return temp;
-            } else if (node->right == nullptr) {
+            } else if (node->right == NULL) {
                 BSTNode* temp = node->left;
                 delete node;
                 return temp;
             }
-
-            // Case 3: 2 children
-            BSTNode* succ = getSuccessor(node);
-            node->poleID = succ->poleID;
-            node->right = delNodeHelper(node->right, succ->poleID, deleted);
+            BSTNode* temp = findMin(node->right);
+            node->data = temp->data;
+            node->right = deleteHelper(node->right, temp->data);
         }
         return node;
     }
 
-    // Helper: Traversals
     void inorderHelper(BSTNode* node) const {
-        if (node == nullptr) return;
+        if (node == NULL) return;
         inorderHelper(node->left);
-        std::cout << node->poleID << " ";
+        std::cout << node->data << " ";
         inorderHelper(node->right);
     }
 
     void preorderHelper(BSTNode* node) const {
-        if (node == nullptr) return;
-        std::cout << node->poleID << " ";
+        if (node == NULL) return;
+        std::cout << node->data << " ";
         preorderHelper(node->left);
         preorderHelper(node->right);
     }
 
     void postorderHelper(BSTNode* node) const {
-        if (node == nullptr) return;
+        if (node == NULL) return;
         postorderHelper(node->left);
         postorderHelper(node->right);
-        std::cout << node->poleID << " ";
+        std::cout << node->data << " ";
     }
 
-    void destroyTree(BSTNode* node) {
-        if (node == nullptr) return;
-        destroyTree(node->left);
-        destroyTree(node->right);
+    void clearHelper(BSTNode* node) {
+        if (node == NULL) return;
+        clearHelper(node->left);
+        clearHelper(node->right);
         delete node;
     }
 
 public:
-    PoleBSTIndex() : root(nullptr), nodeCount(0) {}
+    PoleBST() : root(NULL) {}
 
-    ~PoleBSTIndex() {
-        destroyTree(root);
+    ~PoleBST() {
+        clearHelper(root);
+        root = NULL;
     }
 
     bool isEmpty() const {
-        return root == nullptr;
+        return root == NULL;
     }
 
-    int size() const {
-        return nodeCount;
+    void insert(int val) {
+        root = insertHelper(root, val);
     }
 
-    // Insert key. Returns false if duplicate.
-    bool insert(int id) {
-        bool inserted = false;
-        root = insertHelper(root, id, inserted);
-        return inserted;
+    bool search(int val) const {
+        return searchHelper(root, val);
     }
 
-    // Search key
-    bool search(int id) const {
-        return searchHelper(root, id);
-    }
-
-    // Delete key. Returns false if key doesn't exist.
-    bool remove(int id) {
-        bool deleted = false;
-        root = delNodeHelper(root, id, deleted);
-        return deleted;
+    void remove(int val) {
+        root = deleteHelper(root, val);
     }
 
     void inorder() const {
-        if (root == nullptr) {
-            std::cout << "[BST is empty]\n";
+        if (root == NULL) {
+            std::cout << "BST is empty.\n";
             return;
         }
         inorderHelper(root);
@@ -163,8 +127,8 @@ public:
     }
 
     void preorder() const {
-        if (root == nullptr) {
-            std::cout << "[BST is empty]\n";
+        if (root == NULL) {
+            std::cout << "BST is empty.\n";
             return;
         }
         preorderHelper(root);
@@ -172,8 +136,8 @@ public:
     }
 
     void postorder() const {
-        if (root == nullptr) {
-            std::cout << "[BST is empty]\n";
+        if (root == NULL) {
+            std::cout << "BST is empty.\n";
             return;
         }
         postorderHelper(root);
@@ -181,4 +145,4 @@ public:
     }
 };
 
-#endif // BST_H
+#endif

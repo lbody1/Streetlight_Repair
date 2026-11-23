@@ -1,0 +1,14 @@
+Course: CS212 - Data Structures
+Project Title: Smart Streetlight Repair Desk (Project 77)
+Registered Practical Section: [Enter Section Number here]
+Team ID / Number: [Enter Team ID if assigned]
+Student Name: Abdalrhman [Enter Full Name]
+Student University ID: [Enter Your ID]
+Team Members:
+- Member 1: [Name] - [ID]
+- Member 2: [Name] - [ID]
+- Member 3: [Name] - [ID]
+- Member 4: [Name] - [ID]
+- Member 5: [Name] - [ID]
+- Member 6: [Name] - [ID]
+Project URL: https://github.com/lbody1/Streetlight_Repair

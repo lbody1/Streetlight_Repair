@@ -4,155 +4,123 @@
 #include "Streetlight.h"
 #include <iostream>
 
-// Singly Linked List Node
 struct ListNode {
     Streetlight data;
     ListNode* next;
 
-    ListNode(const Streetlight& light) : data(light), next(nullptr) {}
+    ListNode(Streetlight light) : data(light), next(NULL) {}
 };
 
-// Streetlight Inventory implemented as a Singly Linked List (R4)
-class StreetlightInventory {
+class StreetlightList {
 private:
     ListNode* head;
-    int count;
 
 public:
-    StreetlightInventory() : head(nullptr), count(0) {}
+    StreetlightList() : head(NULL) {}
 
-    ~StreetlightInventory() {
-        clear();
+    ~StreetlightList() {
+        ListNode* curr = head;
+        while (curr != NULL) {
+            ListNode* nxt = curr->next;
+            delete curr;
+            curr = nxt;
+        }
+        head = NULL;
     }
 
     bool isEmpty() const {
-        return head == nullptr;
+        return head == NULL;
     }
 
-    int size() const {
-        return count;
-    }
-
-    // Insert at beginning (O(1))
-    void insertBeginning(const Streetlight& light) {
+    void insert(int id, std::string street, std::string status) {
+        Streetlight light(id, street, status);
         ListNode* newNode = new ListNode(light);
-        newNode->next = head;
-        head = newNode;
-        count++;
-    }
 
-    // Insert at end (O(n))
-    void insertEnd(const Streetlight& light) {
-        ListNode* newNode = new ListNode(light);
-        if (head == nullptr) {
+        if (head == NULL) {
             head = newNode;
-        } else {
-            ListNode* temp = head;
-            while (temp->next != nullptr) {
-                temp = temp->next;
-            }
-            temp->next = newNode;
+            return;
         }
-        count++;
+        ListNode* temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
     }
 
-    // Search by Pole ID (O(n) Linear Search)
     Streetlight* search(int id) {
         ListNode* temp = head;
-        while (temp != nullptr) {
-            if (temp->data.poleID == id) {
-                return &(temp->data); // Return pointer to record for updates
+        while (temp != NULL) {
+            if (temp->data.id == id) {
+                return &(temp->data);
             }
             temp = temp->next;
         }
-        return nullptr;
+        return NULL;
     }
 
-    // Delete node by Pole ID (O(n))
-    bool deleteNode(int id) {
-        if (head == nullptr) return false;
+    void remove(int id) {
+        if (head == NULL) return;
 
         ListNode* temp = head;
-        ListNode* prev = nullptr;
+        ListNode* prev = NULL;
 
-        // If head node itself holds the key
-        if (temp != nullptr && temp->data.poleID == id) {
+        if (temp != NULL && temp->data.id == id) {
             head = temp->next;
             delete temp;
-            count--;
-            return true;
+            return;
         }
 
-        // Search for the key to be deleted
-        while (temp != nullptr && temp->data.poleID != id) {
+        while (temp != NULL && temp->data.id != id) {
             prev = temp;
             temp = temp->next;
         }
 
-        // Key not found
-        if (temp == nullptr) return false;
+        if (temp == NULL) return;
 
-        // Unlink node from linked list
         prev->next = temp->next;
         delete temp;
-        count--;
-        return true;
     }
 
-    // Traversal and display of all inventory records
-    void display() const {
-        if (head == nullptr) {
-            std::cout << " [Inventory is empty]\n";
-            return;
-        }
-        std::cout << "\n--- Current Streetlight Inventory (" << count << " poles) ---\n";
+    int count() const {
+        int c = 0;
         ListNode* temp = head;
-        while (temp != nullptr) {
-            temp->data.display();
+        while (temp != NULL) {
+            c++;
             temp = temp->next;
         }
-        std::cout << "--------------------------------------------------------\n";
+        return c;
     }
 
-    // Sorting algorithm (R6): Insertion Sort on Linked List
-    // Sorts poles ascending by poleID
-    void sortByID() {
-        if (head == nullptr || head->next == nullptr) return;
+    void display() const {
+        if (head == NULL) {
+            std::cout << "Inventory is empty.\n";
+            return;
+        }
+        std::cout << "--- Streetlight Inventory (" << count() << " poles) ---\n";
+        ListNode* temp = head;
+        while (temp != NULL) {
+            std::cout << "ID: " << temp->data.id 
+                      << " | Street: " << temp->data.street 
+                      << " | Status: " << temp->data.status << "\n";
+            temp = temp->next;
+        }
+    }
 
-        ListNode* sorted = nullptr;
-        ListNode* current = head;
+    void sortByStreet() {
+        if (head == NULL || head->next == NULL) return;
 
-        while (current != nullptr) {
-            ListNode* nextNode = current->next;
-
-            // Insert current into sorted sublist
-            if (sorted == nullptr || sorted->data.poleID >= current->data.poleID) {
-                current->next = sorted;
-                sorted = current;
-            } else {
-                ListNode* temp = sorted;
-                while (temp->next != nullptr && temp->next->data.poleID < current->data.poleID) {
-                    temp = temp->next;
+        for (ListNode* i = head; i != NULL; i = i->next) {
+            for (ListNode* j = i->next; j != NULL; j = j->next) {
+                if (i->data.street > j->data.street) {
+                    Streetlight temp = i->data;
+                    i->data = j->data;
+                    j->data = temp;
                 }
-                current->next = temp->next;
-                temp->next = current;
             }
-            current = nextNode;
         }
-        head = sorted;
-        std::cout << " Inventory sorted by Pole ID using Insertion Sort.\n";
-    }
-
-    void clear() {
-        ListNode* current = head;
-        while (current != nullptr) {
-            ListNode* nextNode = current->next;
-            delete current;
-            current = nextNode;
-        }
-        head = nullptr;
-        count = 0;
+        std::cout << "Inventory sorted by street name.\n";
+        display();
     }
 };
 
-#endif // LINKEDLIST_H
+#endif

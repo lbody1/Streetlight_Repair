@@ -2,28 +2,15 @@
 #define STREETLIGHT_H
 
 #include <string>
-#include <iostream>
 
-// Represents a single streetlight pole in the city
 struct Streetlight {
-    int poleID;             // Unique ID (Key for BST and Search)
-    std::string streetName; // Location / Street
-    std::string lampType;   // e.g. LED, Sodium, Solar
-    std::string status;     // "Operational" or "Faulty"
-    int brightness;         // Brightness percentage (0 - 100%)
+    int id;
+    std::string street;
+    std::string status;
 
-    Streetlight() : poleID(0), streetName(""), lampType("LED"), status("Operational"), brightness(100) {}
-
-    Streetlight(int id, std::string street, std::string type, std::string stat, int bright)
-        : poleID(id), streetName(street), lampType(type), status(stat), brightness(bright) {}
-
-    void display() const {
-        std::cout << " [Pole ID: " << poleID 
-                  << " | Location: " << streetName 
-                  << " | Type: " << lampType 
-                  << " | Status: " << status 
-                  << " | Brightness: " << brightness << "%]\n";
-    }
+    Streetlight() : id(0), street(""), status("Working") {}
+    Streetlight(int _id, std::string _street, std::string _status) 
+        : id(_id), street(_street), status(_status) {}
 };
 
-#endif // STREETLIGHT_H
+#endif
